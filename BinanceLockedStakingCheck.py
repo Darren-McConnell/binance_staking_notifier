@@ -1,12 +1,13 @@
 import csv
 import json
 import logging
-import requests
 import sys
+from time import sleep
+from urllib.request import urlopen
+from urllib.error import URLError
 
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from time import sleep
 
 # local import
 import config
@@ -97,12 +98,16 @@ class StakeCheck():
     def get_stake_status(self, stake_type):
         logging.info(f'Requesting {stake_type} staking info from binance...')
         try:
-            resp = requests.get(self.endpoint[stake_type])
-        except Exception as e:
-            logging.error(f'Error return from binance request: {e}')
-            raise(e)
-        logging.info('Request successful')
-        data =  resp.json()['data']
+            with urlopen(self.endpoint[stake_type]) as resp:
+               data = json.loads(resp.read())['data']
+            logging.info('Request successful')
+        except URLError as e:
+            if hasattr(e, 'reason'):
+                err_msg = f'Couldn\'t reach server. Reason: {e.reason}'
+            elif hasattr(e, 'code'):
+                err_msg = f'Server failed to fulfill the request. Error Code: {e.reason}'
+            logging.exception(f'Binance request exception. {err_msg}')
+
         return {
             self.parse_key(project_dict): not project_dict['sellOut']
             for asset in data 
