@@ -22,3 +22,7 @@ Python config (`config.py`):
 
 ## Usage
 `python3 BinanceLockedStakingCheck.py`
+
+Locked ([binance.com/en/pos](https://www.binance.com/en/defi-staking)) & Defi ([binance.com/en/defi-staking](https://www.binance.com/en/defi-staking)) staking products are tracked from separate csv's. Configure `watchlist_defi.csv` & `watchlist_locked.csv` and the notifier will automatically pick up/remove the token/duration pair.
+
+For "Flexible" defi staking products, set the duration set to "flexible"
